@@ -19,6 +19,7 @@ def test_sco():
 
 
 @auth.requires_login()
+@request.restful()
 def service_instances():
     import uuid, os, yaml, json, docker, requests
     id = request.args
@@ -44,22 +45,21 @@ def service_instances():
 	build_content_load = json.load(json_content)
         build_content = json.dumps(build_content_load)
 
-    if len(id) == 1:
-        if request.env.request_method == "PUT":
-            r = requests.post(sco_api_url+'/resources/virtualSystems', verify=False, auth=(sco_api_user, sco_api_password), headers=sco_api_headers, data=build_content)
-            response = { "dashboard_url": id }
-            return response
-        if request.env.request_method == "DELETE":
-            try:
-            	r = requests.get(sco_api_url+'/resources/virtualSystems', verify=False, auth=(sco_api_user, sco_api_password), headers=sco_api_headers)
+     def PUT():	
+     	r = requests.post(sco_api_url+'/resources/virtualSystems', verify=False, auth=(sco_api_user, sco_api_password), headers=sco_api_headers, data=build_content)
+        response = { "dashboard_url": id }
+        return response
+     def DELETE()
+        try:
+        	r = requests.get(sco_api_url+'/resources/virtualSystems', verify=False, auth=(sco_api_user, sco_api_password), headers=sco_api_headers)
 		for i in r.json():
 			if str(i['name']) == str(id[0]):
 				sco_id = str(i['id'])
 				delete = requests.delete(sco_api_url+'/resources/virtualSystems/'+sco_id, verify=False, auth=(sco_api_user, sco_api_password), headers=sco_api_headers)
                	response = {}
                	return response
-            except:
-                raise HTTP(410, "Gone")
+        except:
+        	raise HTTP(410, "Gone")
                 response = {}
                 return response
 
